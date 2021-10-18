@@ -35,22 +35,27 @@ class Connection {
         for ( var i = 0; i < length; i++ ) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength))
         }
+        console.log('gamecode: ', result)
         return result
     }
 
     sendGame()  {
+        console.log('sending game: ', game)
         this.io.sockets.emit('game', game)
     }
 
     sendPlayers()  {
+        console.log('sending players: ', players)
         this.io.sockets.emit('players', players)
     }
 
     sendScores()  {
+        console.log('sending scores: ', scores)
         this.io.sockets.emit('scores', scores)
     }
 
     sendTotals()  {
+        console.log('sending players: ', players)
         this.io.sockets.emit('totals', players)
     }
 
