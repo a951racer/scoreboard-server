@@ -1,4 +1,5 @@
 const uuidv4 = require('uuid').v4
+var qr = require('qr-image')
 
 const users = new Map()
 let game = null
@@ -39,6 +40,11 @@ class Connection {
         return result
     }
 
+    async makeQRCode() {
+        var qr_png = qr.image(process.env.ROOT_URL)
+        qr_png.pipe(require('fs').createWriteStream('qr.png'))
+    }
+
     sendGame()  {
         console.log('sending game: ', game)
         this.io.sockets.emit('game', game)
@@ -59,11 +65,14 @@ class Connection {
         this.io.sockets.emit('totals', players)
     }
 
-    handleNewGame(newGame) {
+    async handleNewGame(newGame) {
+        await this.makeQRCode()
         game = {
             name: newGame.name,
-            code: this.makeGameCode(4)
+            code: this.makeGameCode(4),
+            qr: process.env.ROOT_URL
         }
+
         this.sendGame()
     }
 
