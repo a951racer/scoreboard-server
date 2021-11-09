@@ -1,5 +1,6 @@
 const uuidv4 = require('uuid').v4
 var qr = require('qr-image')
+var AWS = require('aws-sdk')
 
 const users = new Map()
 let game = null
@@ -42,7 +43,28 @@ class Connection {
 
     async makeQRCode() {
         var qr_png = qr.image(process.env.ROOT_URL)
-        qr_png.pipe(require('fs').createWriteStream('qr.png'))
+
+        let s3bucket = new AWS.S3({
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            region: process.env.AWS_REGION
+        })
+    
+        var params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: 'qr.png',
+            Body: qr_png,
+            ContentType: 'image/png',
+            ACL: "public-read"
+        }
+        
+        s3bucket.upload(params, (err, data) => {
+            if (err) {
+                console.error(err)
+            } else {
+                console.log('file uploaded: ', data)
+            }
+        })
     }
 
     sendGame()  {
